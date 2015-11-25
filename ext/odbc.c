@@ -7031,6 +7031,20 @@ stmt_more_results(VALUE self)
     return Qtrue;
 }
 
+static VALUE 
+rb_odbc_raise_error(VALUE err,char * msg)
+{
+    VALUE e;
+    VALUE vmsg = rb_str_new2(msg);
+#ifdef USE_RB_ENC
+    rb_enc_associate_index(vmsg,rb_enc );
+    msg = rb_string_value_cstr(&vmsg);
+#endif
+    e = rb_exc_new2(err,msg);
+    rb_exc_raise(e);
+    return Qnil;
+}
+
 static VALUE
 stmt_prep_int(int argc, VALUE *argv, VALUE self, int mode)
 {
@@ -7052,12 +7066,12 @@ stmt_prep_int(int argc, VALUE *argv, VALUE self, int mode)
 	    if (!succeeded(SQL_NULL_HENV, p->hdbc, q->hstmt,
 			   SQLAllocStmt(p->hdbc, &q->hstmt),
 			   &msg, "SQLAllocStmt")) {
-		rb_raise(Cerror, "%s", msg);
+		rb_odbc_raise_error(Cerror,  msg);
 	    }
 	} else if (!succeeded(SQL_NULL_HENV, SQL_NULL_HDBC, q->hstmt,
 			      SQLFreeStmt(q->hstmt, SQL_CLOSE),
 			      &msg, "SQLFreeStmt(SQL_CLOSE)")) {
-	    rb_raise(Cerror, "%s", msg);
+	    rb_odbc_raise_error(Cerror,  msg);
 	}
 	hstmt = q->hstmt;
 	stmt = self;
@@ -7066,7 +7080,7 @@ stmt_prep_int(int argc, VALUE *argv, VALUE self, int mode)
 	if (!succeeded(SQL_NULL_HENV, p->hdbc, SQL_NULL_HSTMT,
 		       SQLAllocStmt(p->hdbc, &hstmt),
 		       &msg, "SQLAllocStmt")) {
-	    rb_raise(Cerror, "%s", msg);
+	    rb_odbc_raise_error(Cerror,  msg);
 	}
 	stmt = Qnil;
 	dbc = self;
@@ -7120,7 +7134,7 @@ sqlerr:
 	    q->hstmt = SQL_NULL_HSTMT;
 	    unlink_stmt(q);
 	}
-	rb_raise(Cerror, "%s", msg);
+	rb_odbc_raise_error(Cerror,  msg);
     } else {
 	mode |= MAKERES_PREPARE;
     }
