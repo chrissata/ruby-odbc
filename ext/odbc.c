@@ -7031,18 +7031,29 @@ stmt_more_results(VALUE self)
     return Qtrue;
 }
 
-static VALUE 
+
+void
+ rb_enc_raise(rb_encoding *enc, VALUE exc, const char *fmt, ...)
+   {
+va_list args;
+VALUE mesg;
+va_start(args, fmt);
+mesg = rb_enc_vsprintf(enc, fmt, args);
+va_end(args);
+rb_exc_raise(rb_exc_new3(exc, mesg));
+}
+static void 
 rb_odbc_raise_error(VALUE err,char * msg)
 {
     VALUE e;
     VALUE vmsg = rb_str_new2(msg);
 #ifdef USE_RB_ENC
-    rb_enc_associate_index(vmsg,rb_enc );
-    msg = rb_string_value_cstr(&vmsg);
+   // rb_enc_associate_index(vmsg,rb_enc );
+    //msg = rb_string_value_cstr(&vmsg);
+    rb_enc_raise(rb_enc, err, "%s",msg);
 #endif
     e = rb_exc_new2(err,msg);
     rb_exc_raise(e);
-    return Qnil;
 }
 
 static VALUE
