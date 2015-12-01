@@ -7033,7 +7033,7 @@ stmt_more_results(VALUE self)
 
 
 void
- rb_enc_raise(rb_encoding *enc, VALUE exc, const char *fmt, ...)
+ my_rb_enc_raise(rb_encoding *enc, VALUE exc, const char *fmt, ...)
    {
 va_list args;
 VALUE mesg;
@@ -7050,7 +7050,8 @@ rb_odbc_raise_error(VALUE err,char * msg)
 //#ifdef USE_RB_ENC
    // rb_enc_associate_index(vmsg,rb_enc );
     //msg = rb_string_value_cstr(&vmsg);
-    rb_enc_raise(rb_enc, err, "%s",msg);
+    rb_enc = rb_utf8_encoding();
+    my_rb_enc_raise(rb_enc, err, "%s",msg);
 //#endif
   //  e = rb_exc_new2(err,msg);
    // rb_exc_raise(e);
