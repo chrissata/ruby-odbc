@@ -7047,13 +7047,13 @@ rb_odbc_raise_error(VALUE err,char * msg)
 {
     VALUE e;
     VALUE vmsg = rb_str_new2(msg);
-#ifdef USE_RB_ENC
+//#ifdef USE_RB_ENC
    // rb_enc_associate_index(vmsg,rb_enc );
     //msg = rb_string_value_cstr(&vmsg);
     rb_enc_raise(rb_enc, err, "%s",msg);
-#endif
-    e = rb_exc_new2(err,msg);
-    rb_exc_raise(e);
+//#endif
+  //  e = rb_exc_new2(err,msg);
+   // rb_exc_raise(e);
 }
 
 static VALUE
